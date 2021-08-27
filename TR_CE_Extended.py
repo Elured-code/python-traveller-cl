@@ -17,7 +17,7 @@
 #
 
 import logging
-from ppretty import ppretty
+
 import random
 import sys
 from tinydb import TinyDB, Query
@@ -293,15 +293,7 @@ class System:
                 if y <= 9: sClass = 'A'
                 elif y <= 11: sClass = 'B'
                 else: sClass = 'O'
-
-        
-        # Assert block to trap problems where a class is not assigned
-
-        try:
-            assert sClass != ''
-        except AssertionError as AssertionError:
-            logging.exception(AssertionError)
-        
+       
         return sClass
 
         # Determine the spectral class decimal number
@@ -327,14 +319,6 @@ class System:
             elif y in [9, 10, 11]: lum = 'IV'
             else: lum = 'Ib'
         else: lum = 'V'
-
-        # Assert block to catch any errors
-
-        try:
-            assert lum != ''
-        except AssertionError as AssertionError:
-            logging.exception(AssertionError)
-
         return lum
 
     def gen_numStars(self, spectralClass):
