@@ -5,7 +5,7 @@ import TR_Support
 
 # Determine the type of object present, returning a string value for the object type
 
-def determineObjectType():
+def determineobjects():
     x = TR_Support.D100Roll()
     if x <= 80: thisType = "Star"
     elif x <= 88: thisType =  "Brown Dwarf"
@@ -76,12 +76,11 @@ class stellarHex:
         if starRealism not in [1, 2, 3]: starRealism = 1
         self.__starRealism = starRealism
 
-        
-
     def __init__(self, *args):
         if not args: self.objectPresent = False
         else: self.objectPresent = args[0]
-        self.objectType = []
+        self.objects = []
+        self.objects.append({})
         self.starRealism = TR_Constants.SC_REAL
       
 # Check for object presence in the hex
@@ -90,29 +89,47 @@ class stellarHex:
         if subsectorType in TR_Constants.CSUM_DENSITY_MAP:
             x = TR_Support.D100Roll()
             y = TR_Constants.CSUM_DENSITY_MAP[subsectorType]
-            if x <= y: self.objectPresent = True
+            
+            # If there is an object present then set flag to true and initialise the objects list
+            
+            if x <= y: 
+                self.objectPresent = True
+                
             else: self.objectPresent = False
      
-    def determineObjectDetails(self):
+    
+    def determineObjectType(self, objectNumber):
+
+        # Only determine details if there is something in the hex
+
+        if self.objectPresent:
+          
+            # Determine the object type
+
+            oType = determineobjects()
+
+            # Add the information to the objects list
+
+            self.objects[objectNumber]['Type'] = oType
+    
+    def determineStarClass(self, objectNumber):
 
         # Only determine details if there is something in the hex
 
         if self.objectPresent:
 
-            objDetails = {}
-
-            # Determine the object type
-
-            objDetails['Type'] = determineObjectType()
+            sClass = ""
 
             # Determine the object stellar class
 
-            if objDetails['Type'] == "Star": objDetails['Stellar Class'] = determineStarType(self.starRealism, TR_Support.D100Roll())
-            if objDetails['Type'] == "Brown Dwarf": objDetails['Stellar Class'] = determineBrownDwarfType(TR_Support.D100Roll())
+            if self.objects[objectNumber]['Type'] == "Star": sClass = determineStarType(self.starRealism, TR_Support.D100Roll())
+            if self.objects[objectNumber]['Type'] == "Brown Dwarf": sClass = determineBrownDwarfType(TR_Support.D100Roll())
 
-            # Finally, add the information to the objectType list
+            # Finally, add the information to the objects list
 
-            self.objectType.append(objDetails)
+            self.objects[objectNumber]['Stellar Class'] = sClass
+
+
 
 
             
@@ -122,9 +139,11 @@ class stellarHex:
  
 
 my_stellarHex = stellarHex(True)
-my_stellarHex.determineObjectDetails()
+my_stellarHex.checkObjectPresent("DISPERSED")
+my_stellarHex.determineObjectType(0)
+my_stellarHex.determineStarClass(0)
 
-print(my_stellarHex.objectType)
+print(my_stellarHex.objects)
 print("end")
 # thisHex = stellarHex(False)
 
