@@ -46,6 +46,10 @@ class World:
     def tlv(self):
         return self.__tlv
 
+    @property
+    def starPort(self):
+        return self.__starPort
+
         
 # Define setters, including checks
 
@@ -95,7 +99,12 @@ class World:
     def tlv(self, tlv):
         if tlv < 0: self.__tlv = 0
         else: self.__tlv = tlv
-
+    
+    @starPort.setter
+    def starPort(self, starPort):
+        if starPort in TR_Constants.STARPORTS:
+            self.__starPort = starPort
+        else: self.__starPort = "-"
 
 # Initialise the world class        
 
@@ -135,6 +144,31 @@ class World:
         if x < 0: x = 0
         self.hyd = x
 
+    def gen_pop(self, roll):
+        x = roll - 2
+        if self.siz <= 2: x -= 1
+        if self.atm in [0, 1, 10, 11, 12]: x -= 2
+        if self.atm == 6: x  += 3
+        if self.atm in [5, 8]: x += 1
+        if self.hyd == 0 and self.atm < 3: x -= 2
+        if self.pop < 0: x = 0
+        if self.pop > 12: x = 12
+        self.pop = x
+
+    def gen_gov(self, roll):
+        x = roll - 7 + self.pop
+        if self.pop == 0: x = 0
+        self.gov = x
+
+    def gen_law(self, roll):
+        x = roll - 7 + self.gov
+        if self.pop == 0: x = 0
+        self.law = x
+
+    def gen_starPort(self, roll):
+        spRoll = roll - 7 + self.pop
+        self.starPort = TR_Constants.STARPORTSTABLE.get(spRoll)
+
 
 # Randomly generate a mainworld object
 
@@ -148,6 +182,9 @@ class World:
         self.gen_siz(D6Rollx2())
         self.gen_atm(D6Rollx2())
         self.gen_hyd(D6Rollx2())
+        self.gen_pop(D6Rollx2())
+        self.gen_gov(D6Rollx2())
+        
 
 w = World('A')
 w.genWorld()
