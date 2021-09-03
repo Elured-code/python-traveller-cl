@@ -119,6 +119,7 @@ class World:
         self.pop = 0
         self.gov = 0
         self.law = 0
+        self.starPort = 'X'
         self.tlv = 0
     
 # Methods to randmomly generate mainworld properties
@@ -169,6 +170,27 @@ class World:
         spRoll = roll - 7 + self.pop
         self.starPort = TR_Constants.STARPORTSTABLE.get(spRoll)
 
+    def gen_tlv(self, roll):
+        if self.starPort in TR_Constants.STARPORTTLMOD: roll += TR_Constants.STARPORTTLMOD.get(self.starPort)
+        if self.siz in TR_Constants.SIZETLMOD: roll += TR_Constants.SIZETLMOD.get(self.siz)
+        if self.hyd in TR_Constants.HYDTLMOD: roll += TR_Constants.HYDTLMOD.get(self.hyd)
+        if self.atm in TR_Constants.ATMTLMOD: roll += TR_Constants.ATMTLMOD.get(self.atm)
+        if self.pop in TR_Constants.POPTLMOD: roll += TR_Constants.POPTLMOD.get(self.pop)
+        if self.gov in TR_Constants.GOVTLMOD: roll += TR_Constants.GOVTLMOD.get(self.gov)
+
+        # Add CE world condition requirements
+
+        if self.hyd in [0, 10] and self.pop > 6 and roll < 4: roll = 4
+        if self.atm in [4, 7, 9] and roll < 5: roll = 5
+        if self.atm in [0, 1, 2, 3, 10, 11, 12] and roll < 7: roll = 7
+        if self.atm in [13, 14] and self.hyd == 10 and roll < 7: roll = 7
+
+        # Finally, if population is zero, no TL
+
+        if self.pop == 0: roll = 0
+
+        self.tlv = roll       
+
 
 # Randomly generate a mainworld object
 
@@ -184,12 +206,20 @@ class World:
         self.gen_hyd(D6Rollx2())
         self.gen_pop(D6Rollx2())
         self.gen_gov(D6Rollx2())
+        self.gen_law(D6Rollx2())
+        self.gen_starPort(D6Rollx2())
+        self.gen_tlv(D6Roll())
         
 
 w = World('A')
 w.genWorld()
 
+print(w.starPort)
 print(w.siz)
 print(w.atm)
 print(w.hyd)
+print(w.pop)
+print(w.gov)
+print(w.law)
+print(w.tlv)
 

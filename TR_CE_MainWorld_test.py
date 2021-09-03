@@ -13,7 +13,9 @@ HYD_LIST = list(range(0, 11))
 POP_LIST = list(range(0, 13))
 GOV_LIST = list(range(0, 16))
 LAW_LIST = list(range(0, 16))
+TLV_LIST = list(range(0, 19))
 
+D6ROLLS = [1, 2, 3, 4, 5, 6]
 D6X2ROLLS = list(range(2, 13))
 TWOD6X2ROLLS = product(list(range(2, 13)), list(range(2, 13)))
 EXOTIC_ATM = list(range(10, 16))
@@ -120,3 +122,20 @@ def test_gen_starPort(new_World, pop, roll1):
     new_World.pop = pop
     new_World.gen_starPort(roll1)
     assert new_World.starPort in STARPORTS
+
+# ''' Test TL for acceptable values '''
+# @pytest.mark.parametrize("starPort", STARPORTS)
+# @pytest.mark.parametrize("siz", SIZ_LIST)
+# @pytest.mark.parametrize("atm", ATM_LIST)
+# @pytest.mark.parametrize("pop", POP_LIST)
+# @pytest.mark.parametrize("gov", GOV_LIST)
+# @pytest.mark.parametrize("roll1", D6ROLLS)
+# def test_gen_TL(new_World, starPort, siz, atm, pop, gov, roll1):
+#     expect = TLV_LIST
+#     new_World.siz = siz
+#     new_World.atm = atm
+#     new_World.pop = pop
+#     new_World.giv = gov
+#     new_World.starPort = starPort
+#     new_World.gen_tlv(roll1)
+#     assert new_World.tlv in expect
