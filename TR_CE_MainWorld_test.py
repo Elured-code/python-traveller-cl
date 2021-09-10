@@ -13,12 +13,13 @@ HYD_LIST = list(range(0, 11))
 POP_LIST = list(range(0, 13))
 GOV_LIST = list(range(0, 16))
 LAW_LIST = list(range(0, 16))
-TLV_LIST = list(range(0, 19))
+TLV_LIST = list(range(0, 24))
 
 D6ROLLS = [1, 2, 3, 4, 5, 6]
 D6X2ROLLS = list(range(2, 13))
 TWOD6X2ROLLS = product(list(range(2, 13)), list(range(2, 13)))
 EXOTIC_ATM = list(range(10, 16))
+BASES = [' ', 'A', 'N', 'G', 'P', 'S']
 
 
 @pytest.fixture
@@ -71,10 +72,13 @@ def test_gen_hyd_exoticatm_sizA(new_World, atm, roll1):
     assert new_World.hyd in expect
 
 ''' Test pop for acceptable values '''
-@pytest.mark.parametrize("siz", SIZ_LIST)
-@pytest.mark.parametrize("atm", ATM_LIST)
-@pytest.mark.parametrize("hyd", HYD_LIST)
-@pytest.mark.parametrize("roll1", D6X2ROLLS)
+''' At this point unit testing for all possible combinations isn't feasible, so '''
+''' I've used some sample values '''
+
+@pytest.mark.parametrize("siz", [0, 10])
+@pytest.mark.parametrize("atm", [0, 15])
+@pytest.mark.parametrize("hyd", [0, 10])
+@pytest.mark.parametrize("roll1", [2, 12])
 def test_gen_pop(new_World, siz, atm, hyd, roll1):
     expect = POP_LIST
     new_World.siz = siz
@@ -123,19 +127,29 @@ def test_gen_starPort(new_World, pop, roll1):
     new_World.gen_starPort(roll1)
     assert new_World.starPort in STARPORTS
 
-# ''' Test TL for acceptable values '''
-# @pytest.mark.parametrize("starPort", STARPORTS)
-# @pytest.mark.parametrize("siz", SIZ_LIST)
-# @pytest.mark.parametrize("atm", ATM_LIST)
-# @pytest.mark.parametrize("pop", POP_LIST)
-# @pytest.mark.parametrize("gov", GOV_LIST)
-# @pytest.mark.parametrize("roll1", D6ROLLS)
-# def test_gen_TL(new_World, starPort, siz, atm, pop, gov, roll1):
-#     expect = TLV_LIST
-#     new_World.siz = siz
-#     new_World.atm = atm
-#     new_World.pop = pop
-#     new_World.giv = gov
-#     new_World.starPort = starPort
-#     new_World.gen_tlv(roll1)
-#     assert new_World.tlv in expect
+''' Test TL for acceptable values '''
+@pytest.mark.parametrize("starPort", STARPORTS)
+@pytest.mark.parametrize("siz", [0, 10])
+@pytest.mark.parametrize("atm", [0, 15])
+@pytest.mark.parametrize("pop", [0, 10, 11, 12])
+@pytest.mark.parametrize("gov", [0, 7, 15])
+@pytest.mark.parametrize("roll1", D6ROLLS)
+def test_gen_TL(new_World, starPort, siz, atm, pop, gov, roll1):
+    expect = TLV_LIST
+    new_World.siz = siz
+    new_World.atm = atm
+    new_World.pop = pop
+    new_World.giv = gov
+    new_World.starPort = starPort
+    new_World.gen_tlv(roll1)
+    assert new_World.tlv in expect
+
+''' Test bases for acceptable values '''
+@pytest.mark.parametrize("starport", STARPORTS)
+@pytest.mark.parametrize("roll1", [2, 12])
+@pytest.mark.parametrize("roll2", [2, 12])
+@pytest.mark.parametrize("roll3", [2, 12])
+def test_bases(new_World, starport, roll1, roll2, roll3):
+    expect = BASES
+    new_World.gen_bases(roll1, roll2, roll3)
+    assert new_World.bases in expect

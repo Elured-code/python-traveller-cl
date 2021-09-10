@@ -50,6 +50,10 @@ class World:
     def starPort(self):
         return self.__starPort
 
+    @property
+    def bases(self):
+        return self.__bases
+
         
 # Define setters, including checks
 
@@ -106,6 +110,10 @@ class World:
             self.__starPort = starPort
         else: self.__starPort = "-"
 
+    @bases.setter
+    def bases(self, bases):
+        self.__bases = bases
+
 # Initialise the world class        
 
     def __init__(self, wName):
@@ -121,6 +129,7 @@ class World:
         self.law = 0
         self.starPort = 'X'
         self.tlv = 0
+        self.bases = " "
     
 # Methods to randmomly generate mainworld properties
 
@@ -189,7 +198,45 @@ class World:
 
         if self.pop == 0: roll = 0
 
-        self.tlv = roll       
+        self.tlv = roll    
+
+    def gen_bases(self, roll1, roll2, roll3):
+                
+        # Check for Naval bases
+
+        nBase = False
+        if self.starPort == "A" or self.starPort == "B": 
+            if roll1 >= 8: nBase = True
+            else: nBase = False
+
+        # Scout bases / outposts
+
+        sBase = False
+        if self.starPort != "E" and self.starPort != "X":
+            
+            if self.starPort == "A": roll2 -= 3
+            if self.starPort == "B": roll2 -= 2
+            if self.starPort == "C": roll2 -= 1
+            if roll2 >= 7: sBase = True
+            else: sBase = False
+
+        # Pirate bases
+
+        pBase = False
+        if self.starPort != "A" and not nBase:
+            if roll3 == 12: pBase = True
+
+        # Format the base code
+
+        bCode = " "
+        if nBase and sBase: bCode = "A"
+        if nBase and not sBase: bCode = "N"
+        if sBase and pBase: bCode = "G"
+        if pBase and not sBase: bCode = "P"
+        if sBase and not nBase and not pBase: bCode = "S"
+
+        self.bases = bCode
+   
 
 
 # Randomly generate a mainworld object
@@ -209,6 +256,7 @@ class World:
         self.gen_law(D6Rollx2())
         self.gen_starPort(D6Rollx2())
         self.gen_tlv(D6Roll())
+        self.gen_bases(D6Rollx2(), D6Rollx2(), D6Rollx2())
         
 
 w = World('A')
