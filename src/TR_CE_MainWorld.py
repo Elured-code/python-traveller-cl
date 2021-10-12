@@ -3,8 +3,8 @@ import random
 # import TR_Constants
 # from TR_Support import D6Roll, D6Rollx2, D100Roll
 
-import TR_Constants
-from TR_Support import D6Roll, D6Rollx2, D100Roll, D6Rollx3
+from src.utils import TR_Constants
+from src.utils.TR_Support import D6Roll, D6Rollx2, D100Roll, D6Rollx3
 
 
 
@@ -170,6 +170,13 @@ class World:
         if self.pop == 0: x = 0
         self.gov = x
 
+    def gen_pMod(self, roll):
+        x = roll - 2
+        if self.pop > 0 and x < 1: x = 1
+        if self.pop == 0: x = 0
+        if x == 10: x = 9
+        self.pMod = x
+
     def gen_law(self, roll):
         x = roll - 7 + self.gov
         if self.pop == 0: x = 0
@@ -244,7 +251,6 @@ class World:
     def genWorld(self):
 
         # Generate world data
-
     
         # Generate physical stats
 
@@ -252,6 +258,7 @@ class World:
         self.gen_atm(D6Rollx2())
         self.gen_hyd(D6Rollx2())
         self.gen_pop(D6Rollx2())
+        self.gen_pMod(D6Rollx2()) 
         self.gen_gov(D6Rollx2())
         self.gen_law(D6Rollx2())
         self.gen_starPort(D6Rollx2())
