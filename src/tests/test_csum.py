@@ -1,5 +1,6 @@
 import pytest
-from TR_CSUM_Sector import stellarHex
+
+from src.TR_CSUM_Sector import stellarHex
 
 @pytest.fixture
 def occupied_hex():

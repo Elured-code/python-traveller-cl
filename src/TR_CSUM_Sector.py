@@ -1,6 +1,6 @@
 import random
-import TR_Constants
-import TR_Support
+from src.utils import TR_Constants
+from src.utils import TR_Support
 
 
 # Determine the type of object present, returning a string value for the object type
