@@ -1,9 +1,11 @@
-__pycache__/TR_CE_EXT_Stellar.cpython-38.pyc
-__pycache__/TR_CE_SRD_World.cpython-38.pyc
 __pycache__/**
+src/__pycache__/**
+tests/__pycache__/**
+utils/__pycache__/**
+
 build/
 dist/
-test**
+
 .vscode/launch.json
 .vscode/settings.json
 vscode/settings.json

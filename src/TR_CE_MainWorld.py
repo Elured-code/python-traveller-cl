@@ -1,4 +1,5 @@
 import random
+import logging
 
 # import TR_Constants
 # from TR_Support import D6Roll, D6Rollx2, D100Roll
@@ -6,7 +7,14 @@ import random
 from src.utils import TR_Constants
 from src.utils.TR_Support import D6Roll, D6Rollx2, D100Roll, D6Rollx3
 
+# Configure logging
 
+logger = logging.getLogger()
+handler = logging.StreamHandler()
+formatter = logging.Formatter('%(asctime)s %(name)-12s %(levelname)-8s %(message)s', '%d/%m/%Y %I:%M:%S %p')
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+logger.setLevel(logging.DEBUG)
 
 # World class - holds the world details as defined in the CE SRD
 #
@@ -62,53 +70,80 @@ class World:
         # if len(worldname) > 13:
         #     self.__worldname = worldname[0:13]
         self.__worldname = worldname
+        logging.info('World name set to %s', self.__worldname)
 
     @siz.setter
     def siz(self, siz):
-        if siz < 0: self.__siz = 0
-        elif siz > 10: self.__siz = 10
+        if siz < 0: 
+            self.__siz = 0
+            logger.info('Size value %s out of bounds, setting to %s', siz, self.__siz)
+        elif siz > 10: 
+            self.__siz = 10
+            logger.info('Size value %s out of bounds, setting to %s', siz, self.__siz)
         else: self.__siz = siz
 
     @atm.setter
     def atm(self, atm):
-        if atm < 0: self.__atm = 0
-        elif atm > 15: self.__atm = 15
+        if atm < 0: 
+            self.__atm = 0
+            logger.info('Atmosphere value %s out of bounds, setting to %s', atm, self.__atm)
+        elif atm > 15: 
+            self.__atm = 15
+            logger.info('Atmosphere value %s out of bounds, setting to %s', atm, self.__atm)
         else: self.__atm = atm
 
     @hyd.setter
     def hyd(self, hyd):
-        if hyd < 0: self.__hyd = 0
-        elif hyd > 10: self.__hyd = 10
+        if hyd < 0: 
+            self.__hyd = 0
+            logger.info('Hydrographics value %s out of bounds, setting to %s', hyd, self.__hyd)
+        elif hyd > 10: 
+            self.__hyd = 10
+            logger.info('Hydrographics value %s out of bounds, setting to %s', hyd, self.__hyd)
         else: self.__hyd = hyd
 
     @pop.setter
     def pop(self, pop):
-        if pop < 0: self.__pop = 0
+        if pop < 0: 
+            self.__pop = 0
+            logger.info('Population value %s out of bounds, setting to %s', pop, self.__pop)
         elif pop > 10: self.__pop = 10
         else: self.__pop = pop
 
     @gov.setter
     def gov(self, gov):
-        if gov < 0: self.__gov = 0
-        elif gov > 15: self.__gov = 15
+        if gov < 0: 
+            self.__gov = 0
+            logger.info('Government value %s out of bounds, setting to %s', gov, self.__gov)
+        elif gov > 15: 
+            self.__gov = 15
+            logger.info('Government value %s out of bounds, setting to %s', gov, self.__gov)
         else: self.__gov = gov
 
     @law.setter
     def law(self, law):
-        if law < 0: self.__law = 0
-        elif law > 15: self.__law = 15
+        if law < 0: 
+            self.__law = 0
+            logger.info('Law level value %s out of bounds, setting to %s', law, self.__law)
+        elif law > 15: 
+            self.__law = 15
+            logger.info('Law level value %s out of bounds, setting to %s', law, self.__law)
         else: self.__law = law
 
     @tlv.setter
     def tlv(self, tlv):
-        if tlv < 0: self.__tlv = 0
+        if tlv < 0: 
+            self.__tlv = 0
+            logger.info('Tech level value %s out of bounds.  Setting to %s', tlv, self.__tlv)
         else: self.__tlv = tlv
     
     @starPort.setter
     def starPort(self, starPort):
         if starPort in TR_Constants.STARPORTS:
             self.__starPort = starPort
-        else: self.__starPort = "-"
+        else: 
+            self.__starPort = "-"
+            logger.info('Invalid value %s for starport code.  Setting to %s', starPort, self.__starPort)
 
     @bases.setter
     def bases(self, bases):
@@ -117,6 +152,8 @@ class World:
 # Initialise the world class        
 
     def __init__(self, wName):
+
+        logger.debug('Initialising world object with name %s', wName)
         
         # Initialise variables
 
@@ -134,17 +171,22 @@ class World:
 # Methods to randmomly generate mainworld properties
 
     def gen_siz(self, roll):
+        logger.info('Generating size value for %s', self.worldname)
         x = roll - 2
+        logger.info('Result = %s', x)
         self.siz = x
-
+        
     def gen_atm(self, roll):
+        logger.info('Generating atmosphere value for %s', self.worldname)
         x = roll + self.siz - 7
         if x < 0: x = 0
         elif x > 15: x = 15
         if self.siz == 0: x = 0
+        logger.info('Result = %s', x)
         self.atm = x
     
     def gen_hyd(self, roll):
+        logger.info('Generating hydrographics value for %s', self.worldname)
         x = roll + self.siz - 7
 
         if self.siz == 0: x = 0
@@ -152,9 +194,11 @@ class World:
             if self.atm in [0, 1, 10, 11, 12]: x -= 4
             if self.atm == 14: x -= 2
         if x < 0: x = 0
+        logger.info('Result = %s', x)
         self.hyd = x
 
     def gen_pop(self, roll):
+        logger.info('Generating population value for %s', self.worldname)
         x = roll - 2
         if self.siz <= 2: x -= 1
         if self.atm in [0, 1, 10, 11, 12]: x -= 2
@@ -163,30 +207,42 @@ class World:
         if self.hyd == 0 and self.atm < 3: x -= 2
         if self.pop < 0: x = 0
         if self.pop > 12: x = 12
+        logger.info('Result = %s', x)
         self.pop = x
 
     def gen_gov(self, roll):
+        logger.info('Generating government value for %s', self.worldname)
         x = roll - 7 + self.pop
         if self.pop == 0: x = 0
+        logger.info('Result = %s', x)
         self.gov = x
 
     def gen_pMod(self, roll):
+        logger.info('Generating population multiplier for %s', self.worldname)
         x = roll - 2
         if self.pop > 0 and x < 1: x = 1
         if self.pop == 0: x = 0
         if x == 10: x = 9
+        logger.info('Result = %s', x)
         self.pMod = x
 
     def gen_law(self, roll):
+        logger.info('Generating law level value for %s', self.worldname)
         x = roll - 7 + self.gov
-        if self.pop == 0: x = 0
+        if self.pop == 0: 
+            x = 0
+            logger.info('No population, setting law level to 0')
+        logger.info('Result = %s', x)
         self.law = x
 
     def gen_starPort(self, roll):
+        logger.info('Generating starport type for %s', self.worldname)
         spRoll = roll - 7 + self.pop
         self.starPort = TR_Constants.STARPORTSTABLE.get(spRoll)
+        logger.info('Result = %s', self.starPort)
 
     def gen_tlv(self, roll):
+        logger.info('Generating tech level value for %s', self.worldname)
         if self.starPort in TR_Constants.STARPORTTLMOD: roll += TR_Constants.STARPORTTLMOD.get(self.starPort)
         if self.siz in TR_Constants.SIZETLMOD: roll += TR_Constants.SIZETLMOD.get(self.siz)
         if self.hyd in TR_Constants.HYDTLMOD: roll += TR_Constants.HYDTLMOD.get(self.hyd)
@@ -205,9 +261,11 @@ class World:
 
         if self.pop == 0: roll = 0
 
-        self.tlv = roll    
+        self.tlv = roll  
+        logger.info('Result = %s', self.tlv)  
 
     def gen_bases(self, roll1, roll2, roll3):
+        logger.info('Generating base codes for %s', self.worldname)
                 
         # Check for Naval bases
 
@@ -243,12 +301,15 @@ class World:
         if sBase and not nBase and not pBase: bCode = "S"
 
         self.bases = bCode
+        logger.info('Result = %s', bCode)
+
    
 
 
 # Randomly generate a mainworld object
 
     def genWorld(self):
+        logger.info('Generating world data for %s', self.worldname)
 
         # Generate world data
     
@@ -266,15 +327,18 @@ class World:
         self.gen_bases(D6Rollx2(), D6Rollx2(), D6Rollx2())
         
 
-w = World('A')
-w.genWorld()
+# Only execute if this code is called directly - used proimarily to debug output values
 
-print(w.starPort)
-print(w.siz)
-print(w.atm)
-print(w.hyd)
-print(w.pop)
-print(w.gov)
-print(w.law)
-print(w.tlv)
+if __name__ == '__main__':
+    w = World('Aworld')
+    w.genWorld()
+
+    print(w.starPort)
+    print(w.siz)
+    print(w.atm)
+    print(w.hyd)
+    print(w.pop)
+    print(w.gov)
+    print(w.law)
+    print(w.tlv)
 
