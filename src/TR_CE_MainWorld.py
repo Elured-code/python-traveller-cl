@@ -62,6 +62,10 @@ class World:
     def bases(self):
         return self.__bases
 
+    @property
+    def nbelts(self):
+        return self.__nbelts
+
         
 # Define setters, including checks
 
@@ -149,9 +153,20 @@ class World:
     def bases(self, bases):
         self.__bases = bases
 
+    @nbelts.setter
+    def nbelts(self, nbelts):
+        self.__nbelts = nbelts
+        if nbelts < 0:
+            self.__nbelts = 0
+            logger.info('Number of planetoid belts %s is out of bounds.  Setting to %s', nbelts, self.__nbelts)
+        if nbelts > 3:
+            self.__nbelts = 3
+            logger.info('Number of planetoid belts %s is out of bounds.  Setting to %s', nbelts, self.__nbelts)
+
 # Initialise the world class        
 
     def __init__(self, wName):
+        '''Takes a world name (wName) and initialises a mainworld object with that world name (self.worldname)'''
 
         logger.debug('Initialising world object with name %s', wName)
         
@@ -167,16 +182,23 @@ class World:
         self.starPort = 'X'
         self.tlv = 0
         self.bases = " "
+        self.pMod = 0
+        self.nBelts = 0
+        self.nGiants = 0
+        self.tCodeString = ""
+        self.tZone = " "
     
 # Methods to randmomly generate mainworld properties
 
     def gen_siz(self, roll):
+        '''Takes a 2d6 dice roll (roll) and determines the mainworld size value (self.siz)'''
         logger.info('Generating size value for %s', self.worldname)
         x = roll - 2
         logger.info('Result = %s', x)
         self.siz = x
         
     def gen_atm(self, roll):
+        '''Takes a 2d6 dice roll (roll) and determines the mainworld atmosphere value (self.atm) as a function of size (self.siz)'''
         logger.info('Generating atmosphere value for %s', self.worldname)
         x = roll + self.siz - 7
         if x < 0: x = 0
@@ -303,7 +325,21 @@ class World:
         self.bases = bCode
         logger.info('Result = %s', bCode)
 
-   
+    def gen_nbelts(self, roll, roll2):
+
+            logger.info('Generating planetoid belts for %s', self.worldname)
+            
+            # Determine the presence of planetoid belts
+
+            nBelts = 0           
+            if roll >= 4:
+                nBelts = roll2 - 3
+                if self.__siz == 0 and nBelts < 1: 
+                    nBelts = 1
+                    logger.info('Mainworld size is 0 but no belts present.  Setting number of belts to %s', nBelts)
+                  
+            logger.info('Result = %s', nBelts)
+            self.nBelts = nBelts  
 
 
 # Randomly generate a mainworld object
@@ -325,6 +361,7 @@ class World:
         self.gen_starPort(D6Rollx2())
         self.gen_tlv(D6Roll())
         self.gen_bases(D6Rollx2(), D6Rollx2(), D6Rollx2())
+        self.gen_nbelts(D6Rollx2(), D6Roll())
         
 
 # Only execute if this code is called directly - used proimarily to debug output values
