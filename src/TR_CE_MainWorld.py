@@ -191,14 +191,14 @@ class World:
 # Methods to randmomly generate mainworld properties
 
     def gen_siz(self, roll):
-        '''Takes a 2d6 dice roll (roll) and determines the mainworld size value (self.siz)'''
+        '''Takes a dice roll (roll) and determines the mainworld size value (self.siz)'''
         logger.info('Generating size value for %s', self.worldname)
         x = roll - 2
         logger.info('Result = %s', x)
         self.siz = x
         
     def gen_atm(self, roll):
-        '''Takes a 2d6 dice roll (roll) and determines the mainworld atmosphere value (self.atm) as a function of size (self.siz)'''
+        '''Takes a dice roll (roll) and determines the mainworld atmosphere value (self.atm) as a function of size (self.siz)'''
         logger.info('Generating atmosphere value for %s', self.worldname)
         x = roll + self.siz - 7
         if x < 0: x = 0
@@ -208,6 +208,7 @@ class World:
         self.atm = x
     
     def gen_hyd(self, roll):
+        '''Takes a dice roll (roll) and determines the mainworld hydrographics value (self.hyd) as a function of size (self.siz)'''
         logger.info('Generating hydrographics value for %s', self.worldname)
         x = roll + self.siz - 7
 
@@ -220,6 +221,8 @@ class World:
         self.hyd = x
 
     def gen_pop(self, roll):
+        '''Takes a dice roll (roll) and determines the mainworld population value (self.pop) as a function of
+        size (self.siz), atmosphere (self.atm) and hydrographics (self.hyd)'''
         logger.info('Generating population value for %s', self.worldname)
         x = roll - 2
         if self.siz <= 2: x -= 1
@@ -233,6 +236,7 @@ class World:
         self.pop = x
 
     def gen_gov(self, roll):
+        '''Takes a dice roll (roll) and determines the mainworld government value (self.gov) and a function of population (self.pop)'''
         logger.info('Generating government value for %s', self.worldname)
         x = roll - 7 + self.pop
         if self.pop == 0: x = 0
@@ -240,6 +244,7 @@ class World:
         self.gov = x
 
     def gen_pMod(self, roll):
+        '''Takes a dice roll (roll) and determines the population multiplier value (self.pMod)'''
         logger.info('Generating population multiplier for %s', self.worldname)
         x = roll - 2
         if self.pop > 0 and x < 1: x = 1
@@ -249,6 +254,7 @@ class World:
         self.pMod = x
 
     def gen_law(self, roll):
+        '''Takes a dice roll (roll) and determines the law level value (self.law) as a function of population (self.pop)'''
         logger.info('Generating law level value for %s', self.worldname)
         x = roll - 7 + self.gov
         if self.pop == 0: 
@@ -258,12 +264,16 @@ class World:
         self.law = x
 
     def gen_starPort(self, roll):
+        '''Takes a dice roll (roll) and determines the starport type as a function of population (self.pop)'''
         logger.info('Generating starport type for %s', self.worldname)
         spRoll = roll - 7 + self.pop
         self.starPort = TR_Constants.STARPORTSTABLE.get(spRoll)
         logger.info('Result = %s', self.starPort)
 
     def gen_tlv(self, roll):
+        '''Takes a dice roll (roll) and determines the tech level value as a function of
+        size (self.siz), hydrographics (self.hyd), atmosphere (self.atm), population (self.pop) and 
+        government (self.gov)'''
         logger.info('Generating tech level value for %s', self.worldname)
         if self.starPort in TR_Constants.STARPORTTLMOD: roll += TR_Constants.STARPORTTLMOD.get(self.starPort)
         if self.siz in TR_Constants.SIZETLMOD: roll += TR_Constants.SIZETLMOD.get(self.siz)
@@ -287,6 +297,8 @@ class World:
         logger.info('Result = %s', self.tlv)  
 
     def gen_bases(self, roll1, roll2, roll3):
+        '''Takes 3 x dice rolls (roll1, roll2, roll3) and determines mainworld bases as a function of
+        starport type (self.starPort)'''
         logger.info('Generating base codes for %s', self.worldname)
                 
         # Check for Naval bases
@@ -326,25 +338,28 @@ class World:
         logger.info('Result = %s', bCode)
 
     def gen_nbelts(self, roll, roll2):
+        '''Takes 2 x dice rolls (roll1, roll2) and determines the number of planetoid belts as a function of
+        size (self.siz)'''
 
-            logger.info('Generating planetoid belts for %s', self.worldname)
-            
-            # Determine the presence of planetoid belts
+        logger.info('Generating planetoid belts for %s', self.worldname)
+        
+        # Determine the presence of planetoid belts
 
-            nBelts = 0           
-            if roll >= 4:
-                nBelts = roll2 - 3
-                if self.__siz == 0 and nBelts < 1: 
-                    nBelts = 1
-                    logger.info('Mainworld size is 0 but no belts present.  Setting number of belts to %s', nBelts)
-                  
-            logger.info('Result = %s', nBelts)
-            self.nBelts = nBelts  
+        nBelts = 0           
+        if roll >= 4:
+            nBelts = roll2 - 3
+            if self.__siz == 0 and nBelts < 1: 
+                nBelts = 1
+                logger.info('Mainworld size is 0 but no belts present.  Setting number of belts to %s', nBelts)
+                
+        logger.info('Result = %s', nBelts)
+        self.nBelts = nBelts  
 
 
 # Randomly generate a mainworld object
 
     def genWorld(self):
+        '''Generate attribute values for a mainworld object'''
         logger.info('Generating world data for %s', self.worldname)
 
         # Generate world data
