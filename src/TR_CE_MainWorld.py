@@ -28,6 +28,10 @@ class World:
         return self.__worldname
 
     @property
+    def loc(self):
+        return self.__loc
+
+    @property
     def siz(self):
         return self.__siz
     @property
@@ -75,6 +79,13 @@ class World:
         #     self.__worldname = worldname[0:13]
         self.__worldname = worldname
         logging.info('World name set to %s', self.__worldname)
+
+    @loc.setter
+    def loc(self, loc):
+        # Add code here to check location value for suitability
+
+        self.__loc = loc
+        logging.info('World location set to %s', loc)
 
     @siz.setter
     def siz(self, siz):
@@ -173,6 +184,7 @@ class World:
         # Initialise variables
 
         self.worldname = wName
+        self.loc = "0000"
         self.siz = 0
         self.atm = 0
         self.hyd = 0
@@ -183,12 +195,57 @@ class World:
         self.tlv = 0
         self.bases = " "
         self.pMod = 0
-        self.nBelts = 0
+        self.nbelts = 0
         self.nGiants = 0
         self.tCodeString = ""
         self.tZone = " "
+
+    # Represent the mainworld object
+
+    def __repr__(self):
+        
+        # Capitalise the world name if it is a high population world
+
+        if self.pop >= 9: self.worldname = self.worldname.upper()
+
+        # Build the UWP String from the values generated above
+
+        # Pad the world name with strings to column 13
+        
+        self.worldname = "{:<14}".format(self.worldname)
+
+        
+        returnstr = self.worldname[0:13]
+        returnstr += self.loc + " "
+        returnstr += self.starPort
+        returnstr += TR_Constants.UWPCODETABLE.get(self.siz)
+        returnstr += TR_Constants.UWPCODETABLE.get(self.atm)
+        returnstr += TR_Constants.UWPCODETABLE.get(self.hyd)
+        returnstr += TR_Constants.UWPCODETABLE.get(self.pop)
+        returnstr += TR_Constants.UWPCODETABLE.get(self.gov)
+        returnstr += TR_Constants.UWPCODETABLE.get(self.law)
+        returnstr += "-" + TR_Constants.UWPCODETABLE.get(self.tlv)
+        returnstr = returnstr + " " + self.bases
+        returnstr += " " + self.tCodeString
+
+        # Pad the UWP String with spaces to column 48
+
+        returnstr = "{:<48}".format(returnstr)
+
+        returnstr += self.tZone
+        
+        # Add the PBG data
+
+        returnstr += "  " + str(self.pMod) + str(self.nbelts) + str(self.nGiants)
+
+        return returnstr
+
+    # Return a string of the mainworld objecy containing its data
+
+    def __str__(self):
+        return self.__repr__()
     
-# Methods to randmomly generate mainworld properties
+    # Methods to randmomly generate mainworld properties
 
     def gen_siz(self, roll):
         '''Takes a dice roll (roll) and determines the mainworld size value (self.siz)'''
@@ -345,15 +402,15 @@ class World:
         
         # Determine the presence of planetoid belts
 
-        nBelts = 0           
+        nbelts = 0           
         if roll >= 4:
-            nBelts = roll2 - 3
-            if self.__siz == 0 and nBelts < 1: 
-                nBelts = 1
-                logger.info('Mainworld size is 0 but no belts present.  Setting number of belts to %s', nBelts)
+            nbelts = roll2 - 3
+            if self.__siz == 0 and nbelts < 1: 
+                nbelts = 1
+                logger.info('Mainworld size is 0 but no belts present.  Setting number of belts to %s', nbelts)
                 
-        logger.info('Result = %s', nBelts)
-        self.nBelts = nBelts  
+        logger.info('Result = %s', nbelts)
+        self.nbelts = nbelts  
 
 
 # Randomly generate a mainworld object
@@ -383,14 +440,8 @@ class World:
 
 if __name__ == '__main__':
     w = World('Aworld')
+    w.loc = "0101"
     w.genWorld()
 
-    print(w.starPort)
-    print(w.siz)
-    print(w.atm)
-    print(w.hyd)
-    print(w.pop)
-    print(w.gov)
-    print(w.law)
-    print(w.tlv)
+    print(w)
 
