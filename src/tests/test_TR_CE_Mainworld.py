@@ -172,10 +172,17 @@ def test_bases(new_World, starport, roll1, roll2, roll3):
     assert new_World.bases in expect
 
 ''' Test belt generation for acceptable values '''
-@pytest.mark.parametrize("siz", [0, 10])
-@pytest.mark.parametrize("roll1", [2, 12])
+@pytest.mark.parametrize("roll1", D6X2ROLLS)
 @pytest.mark.parametrize("roll2", D6ROLLS)
-def test_belts(new_World, siz, roll1, roll2):
-    expect = [999, 1000]
-    new_World.gen_nbelts(siz, roll1, roll2)
+def test_belts(new_World, roll1, roll2):
+    expect = range(0, 4)
+    new_World.gen_nbelts(roll1, roll2)
     assert new_World.nbelts in expect
+
+''' Test gas giant generation for acceptable values '''
+@pytest.mark.parametrize("roll1", D6X2ROLLS)
+@pytest.mark.parametrize("roll2", D6ROLLS)
+def test_giants(new_World, roll1, roll2):
+    expect = range(0, 5)
+    new_World.gen_ngiants(roll1, roll2)
+    assert new_World.ngiants in expect

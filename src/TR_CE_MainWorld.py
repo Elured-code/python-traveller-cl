@@ -11,7 +11,7 @@ from src.utils.TR_Support import D6Roll, D6Rollx2, D100Roll, D6Rollx3
 
 logger = logging.getLogger()
 handler = logging.StreamHandler()
-formatter = logging.Formatter('%(asctime)s %(name)-12s %(levelname)-8s %(message)s', '%d/%m/%Y %I:%M:%S %p')
+formatter = logging.Formatter('%(asctime)s %(name)-12s %(funcName)-20s %(levelname)-8s %(message)s', '%d/%m/%Y %I:%M:%S %p')
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 logger.setLevel(logging.DEBUG)
@@ -69,6 +69,14 @@ class World:
     @property
     def nbelts(self):
         return self.__nbelts
+
+    @property
+    def ngiants(self):
+        return self.__ngiants
+
+    @property
+    def tradecodes(self):
+        return self.__tradecodes
 
         
 # Define setters, including checks
@@ -174,6 +182,20 @@ class World:
             self.__nbelts = 3
             logger.info('Number of planetoid belts %s is out of bounds.  Setting to %s', nbelts, self.__nbelts)
 
+    @ngiants.setter
+    def ngiants(self, ngiants):
+        self.__ngiants = ngiants
+        if ngiants < 0:
+            self.__ngiants = 0
+            logger.info('Number of gas giants %s is out of bounds.  Setting to %s', ngiants, self.__ngiants)
+        if ngiants > 4:
+            self.__ngiants = 4
+            logger.info('Number of gas giants %s is out of bounds.  Setting to %s', ngiants, self.__ngiants)
+
+    @tradecodes.setter
+    def tradecodes(self, tradecodes):
+        self.__tradecodes = tradecodes
+
 # Initialise the world class        
 
     def __init__(self, wName):
@@ -196,8 +218,8 @@ class World:
         self.bases = " "
         self.pMod = 0
         self.nbelts = 0
-        self.nGiants = 0
-        self.tCodeString = ""
+        self.ngiants = 0
+        self.tradecodes = ""
         self.tZone = " "
 
     # Represent the mainworld object
@@ -212,10 +234,9 @@ class World:
 
         # Pad the world name with strings to column 13
         
-        self.worldname = "{:<14}".format(self.worldname)
-
-        
-        returnstr = self.worldname[0:13]
+        temp_worldname = "{:11.11}".format(self.worldname) + ' '
+                
+        returnstr = temp_worldname
         returnstr += self.loc + " "
         returnstr += self.starPort
         returnstr += TR_Constants.UWPCODETABLE.get(self.siz)
@@ -226,7 +247,15 @@ class World:
         returnstr += TR_Constants.UWPCODETABLE.get(self.law)
         returnstr += "-" + TR_Constants.UWPCODETABLE.get(self.tlv)
         returnstr = returnstr + " " + self.bases
-        returnstr += " " + self.tCodeString
+
+        # Format the trade code string
+
+        tcode_string = ''
+        for t in self.tradecodes:
+            tcode_string += t + " "
+        tcode_string.rstrip()
+
+        returnstr += " " + tcode_string
 
         # Pad the UWP String with spaces to column 48
 
@@ -236,7 +265,7 @@ class World:
         
         # Add the PBG data
 
-        returnstr += "  " + str(self.pMod) + str(self.nbelts) + str(self.nGiants)
+        returnstr += "  " + str(self.pMod) + str(self.nbelts) + str(self.ngiants)
 
         return returnstr
 
@@ -407,11 +436,54 @@ class World:
             nbelts = roll2 - 3
             if self.__siz == 0 and nbelts < 1: 
                 nbelts = 1
-                logger.info('Mainworld size is 0 but no belts present.  Setting number of belts to %s', nbelts)
+                logger.info('Mainworld size is 0 but no belts present.  Setting number of belts to %s', nbelts) 
                 
         logger.info('Result = %s', nbelts)
         self.nbelts = nbelts  
 
+    def gen_ngiants(self, roll1, roll2):
+        '''Takes 2 x dice rolls (roll1, roll2) and determines the number of gas giants'''
+
+        logger.info('Generating gas giants for %s', self.worldname)
+
+        # Determine the presence of gas giants
+
+        if D6Rollx2() >= 5:
+            ngiants = D6Roll() - 2
+            if ngiants < 1: ngiants = 1
+        else: ngiants = 0
+        logger.info('Result = %s', ngiants)
+        self.ngiants = ngiants
+
+    def gen_tradecodes(self):
+        '''Determines the mainworld trade codes from attribute values'''
+
+        logger.info('Determining trade codes for %s', self.worldname)
+
+        # Generate trade codes
+
+        tcode = []
+        if self.atm >= 4 and self.atm <= 9 and self.hyd >= 4 and self.hyd <= 8 and self.pop >= 5 and self.pop <= 7: tcode.append("Ag")
+        if self.siz == 0 and self.atm == 0 and self.hyd == 0: tcode.append("As")
+        if self.pop == 0 and self.gov  == 0 and self.law == 0: tcode.append("Ba") 
+        if self.atm >= 2 and self.hyd == 0: tcode.append("De")
+        if self.atm >= 10 and self.hyd >= 1: tcode.append("Fl")
+        if self.atm in [5, 6, 8] and self.hyd >= 4 and self.hyd <= 9 and self.pop >= 4 and self.pop <= 8: tcode.append("Ga")
+        if self.pop >= 9: tcode.append("Hi")
+        if self.tlv >= 12: tcode.append("Ht")
+        if self.atm in [0, 1] and self.hyd >= 1: tcode.append("Ic")
+        if self.atm in [0, 1, 2, 4, 7, 9] and self.pop >= 9: tcode.append("In")
+        if self.pop >= 1 and self.pop <= 3: tcode.append("Lo")
+        if self.tlv <= 5: tcode.append("Lt")
+        if self.atm <= 3 and self.hyd <= 3 and self.pop >= 6: tcode.append("Na")
+        if self.pop >= 4 and self.pop <= 6: tcode.append("Ni")
+        if self.atm >= 2 and self.atm <= 5 and self.hyd <= 3: tcode.append("Po")
+        if self.atm in [6, 8] and self.pop >= 6 and self.pop <= 8: tcode.append("Ri")
+        if self.hyd == 10: tcode.append("Wa")
+        if self.atm == 0: tcode.append("Va")
+
+        self.tradecodes = tcode
+        logger.info('Generated trade codes = %s', self.tradecodes)
 
 # Randomly generate a mainworld object
 
@@ -434,6 +506,8 @@ class World:
         self.gen_tlv(D6Roll())
         self.gen_bases(D6Rollx2(), D6Rollx2(), D6Rollx2())
         self.gen_nbelts(D6Rollx2(), D6Roll())
+        self.gen_ngiants(D6Rollx2(), D6Roll())
+        self.gen_tradecodes()
         
 
 # Only execute if this code is called directly - used proimarily to debug output values
