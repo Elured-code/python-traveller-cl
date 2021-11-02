@@ -4,8 +4,8 @@ import logging
 # import TR_Constants
 # from TR_Support import D6Roll, D6Rollx2, D100Roll
 
-from src.utils import TR_Constants
-from src.utils.TR_Support import D6Roll, D6Rollx2, D100Roll, D6Rollx3
+from python_traveller_cl.utils import TR_Constants
+from python_traveller_cl.utils.TR_Support import D6Roll, D6Rollx2, D100Roll, D6Rollx3
 
 # Configure logging
 

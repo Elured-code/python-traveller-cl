@@ -3,9 +3,9 @@ from _pytest.python_api import ApproxMapping
 
 import pytest
 from itertools import product, permutations
-from src.utils.TR_Constants import HYDTLMOD, STARPORTS
-from src.TR_CE_MainWorld import World
-from src.utils.TR_Support import D6Rollx2
+from python_traveller_cl.utils.TR_Constants import HYDTLMOD, STARPORTS
+from python_traveller_cl.TR_CE_MainWorld import World
+from python_traveller_cl.utils.TR_Support import D6Rollx2
 
 
 SIZ_LIST = list(range(0, 11))
